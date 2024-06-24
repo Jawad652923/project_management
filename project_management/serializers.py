@@ -22,21 +22,15 @@ class ProjectSerializer(serializers.ModelSerializer):
             project.users.add(user)
         return project
     
-    def update(self, instance, validated_data):
-        if self.context.get('action') == 'add_user':
-            user_id = self.initial_data.get('user_id')
-            try:
-                user = User.objects.get(id=user_id)
-                instance.users.add(user)
-                return instance
-            except User.DoesNotExist:
-                raise serializers.ValidationError({'user_id': 'Invalid user ID'})
-        else:
-            instance.name = validated_data.get('name', instance.name)
-            instance.description = validated_data.get('description', instance.description)
-            instance.save()
-            return instance
+    def update(self, instance, validated_data):        
+        instance.name = validated_data.get('name', instance.name)
+        instance.description = validated_data.get('description', instance.description)
+        instance.save()
+        return instance
 
+
+class AddUserSerializer(serializers.Serializer):
+    user_id = serializers.IntegerField()
 
 class TaskSerializer(serializers.ModelSerializer):
     class Meta:
