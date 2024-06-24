@@ -15,15 +15,27 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
-from rest_framework_simplejwt.views import (TokenObtainPairView,TokenRefreshView,)
+from django.urls import path
+# from rest_framework_simplejwt.views import (TokenObtainPairView,TokenRefreshView,)
+from user.views import RegisterView, LoginView,UserListView
+from project_management.views import ProjectListCreateAPIView, ProjectDetailAPIView, ProjectAssignPermissionsAPIView, TaskListCreateAPIView, TaskDetailAPIView
+from project_management import views
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('project_management.urls')),
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+
+    path('register/',RegisterView.as_view(), name='register_view'),
+    path('login/',LoginView.as_view(), name='login_view'),
+    path('api/users/', UserListView.as_view(), name='get_users_list'),
+
+    path('projects/', ProjectListCreateAPIView.as_view(), name='project-list-create'),
+    path('projects/<int:pk>/', ProjectDetailAPIView.as_view(), name='project-detail'),
+    path('projects/<int:pk>/add_user/', ProjectDetailAPIView.as_view(), name='project-add-user'),
+    path('projects/<int:pk>/assign_permissions/', ProjectAssignPermissionsAPIView.as_view(), name='project-assign-permissions'),
+
+    path('tasks/', TaskListCreateAPIView.as_view(), name='task-list-create'),
+    path('tasks/<int:pk>/', TaskDetailAPIView.as_view(), name='task-detail'),
 ]
 
 
