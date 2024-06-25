@@ -4,8 +4,8 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
-from .models import Projects, Tasks
-from .serializers import ProjectSerializer, TaskSerializer, AddUserSerializer
+from .models import Projects, Tasks , TaskPermission
+from .serializers import ProjectSerializer,UpdateProjectSerializer, TaskSerializer, AddUserSerializer
 import logging
 
 
@@ -37,7 +37,7 @@ class ProjectListCreateAPIView(APIView):
             for user_id in user_ids:
                 user = User.objects.get(id=user_id)
                 project.users.add(user)
-            return True, ""
+            return True, "user added in project"
         except User.DoesNotExist:
             return False, "One or more users not found"
 
@@ -49,17 +49,17 @@ class ProjectDetailAPIView(APIView):
         return get_object_or_404(Projects, pk=pk, is_deleted=False)
 
     def get(self, request, pk):
-        project = self.get_object(pk)
-        serializer = ProjectSerializer(project)
+        project_instance = Projects.objects.get(pk=pk)
+        serializer = ProjectSerializer(project_instance)
         return Response(serializer.data)
 
     def put(self, request, pk):
         project = self.get_object(pk)
-        serializer = ProjectSerializer(project, data=request.data)
+        serializer = UpdateProjectSerializer(project, data=request.data)
 
         if 'user_ids' in request.data:
             context = {'action': 'add_user'}
-            serializer = ProjectSerializer(project, data=request.data, context=context)
+            serializer = UpdateProjectSerializer(project, data=request.data, context=context)
 
         if serializer.is_valid():
             serializer.save()
@@ -77,7 +77,7 @@ class ProjectAddUserAPIView(APIView):
 
     def put(self, request, pk):
         project = get_object_or_404(Projects, pk=pk, is_deleted=False)
-        logging.debug(f"Request data: {request.data}")
+        # logging.debug(f"Request data: {request.data}")
         serializer = AddUserSerializer(data=request.data)
         if serializer.is_valid():
             user_id = serializer.validated_data['user_id']
@@ -87,7 +87,7 @@ class ProjectAddUserAPIView(APIView):
                 return Response({'status': 'user added'}, status=status.HTTP_200_OK)
             except User.DoesNotExist:
                 return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
-        logging.debug(f"Serializer errors: {serializer.errors}")
+        # logging.debug(f"Serializer errors: {serializer.errors}")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -95,7 +95,9 @@ class ProjectAssignPermissionsAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, pk):
+        # logging.debug(f"Request data: {request.data}")
         project = get_object_or_404(Projects, pk=pk, is_deleted=False)
+        # logging.debug(f"Project: {project}")
         user_id = request.data.get('user_id')
         permissions = {
             'can_create': request.data.get('can_create', False),
@@ -105,10 +107,34 @@ class ProjectAssignPermissionsAPIView(APIView):
         }
         try:
             user = User.objects.get(id=user_id)
-            project.assign_task_permissions(user, permissions)
+            project.assign_task_permission(user, permissions)
+            # logging.debug("Permissions assigned successfully")
             return Response({'status': 'Permissions assigned'}, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+class RetrieveTaskPermissionsAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, project_pk, user_id):
+        project = get_object_or_404(Projects, pk=project_pk, is_deleted=False)
+        try:
+            user = User.objects.get(id=user_id)
+            task_permission = get_object_or_404(TaskPermission, user=user, project=project)
+            return Response({
+                'user_id': user.id,
+                'project_id': project.id,
+                'can_create': task_permission.can_create,
+                'can_read': task_permission.can_read,
+                'can_update': task_permission.can_update,
+                'can_delete': task_permission.can_delete,
+            }, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+        except TaskPermission.DoesNotExist:
+            return Response({'error': 'Permissions not found for this user and project'}, status=status.HTTP_404_NOT_FOUND)
+        
 
 
 class TaskListCreateAPIView(APIView):
@@ -125,6 +151,8 @@ class TaskListCreateAPIView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 
 class TaskDetailAPIView(APIView):

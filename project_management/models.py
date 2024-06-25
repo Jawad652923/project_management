@@ -1,11 +1,15 @@
 from django.db import models
+from django.db.models import Prefetch
 from django.contrib.auth.models import User
 
 class Projects(models.Model):
-    name= models.CharField(max_length=255,unique=True)
-    description=models.TextField()
+    name = models.CharField(max_length=255,unique=True)
+    description = models.TextField()
     users = models.ManyToManyField(User, related_name='user_projects')
-    is_deleted=models.BooleanField(default=False)
+    is_deleted = models.BooleanField(default=False)
+    permission = models.JSONField(default=dict)
+    
+
     
     def soft_delete(self):
         self.is_deleted=True
@@ -17,9 +21,19 @@ class Projects(models.Model):
         task_permission.can_read = permissions.get('can_read',False)
         task_permission.can_update = permissions.get('can_update',False)
         task_permission.can_delete = permissions.get('can_delete',False)
-    
-    def get_users_with_permissions(self):
-        return User.objects.filter(user_project=self)
+        task_permission.save()
+
+
+    def get_permissions(self, obj):
+        permissions = getattr(obj, 'permissions', None)
+        if permissions:
+            return {
+                'can_create': permissions.can_create,
+                'can_read': permissions.can_read,
+                'can_update': permissions.can_update,
+                'can_delete': permissions.can_delete,
+            }
+        return {}
 
 class Tasks(models.Model):
     project=models.ForeignKey(Projects, related_name='task_name',on_delete=models.CASCADE)
@@ -41,3 +55,6 @@ class TaskPermission(models.Model):
     can_read   = models.BooleanField(default=True)
     can_update = models.BooleanField(default=True)
     can_delete = models.BooleanField(default=True)
+
+
+    
