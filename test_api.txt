@@ -1,0 +1,79 @@
+first register/login yourself with credentials.
+
+for register     / POST method
+/register/
+username : your_user_name
+email : your_email
+password : your_pass
+
+for login    / POST method
+/login/
+username : your_user_name 
+password : your_pass
+
+for getting lists of users    / GET method
+/api/users/
+
+
+
+
+for creating project  / POST method
+name : project_name
+description : project_description
+
+
+for getting lists of project  / GET method
+/projects/
+
+
+for updating a project  /PUT method
+/projects/<int:project_id>/
+name : project_name
+description : project_description
+
+for deleting project  / DELETE method
+/projects/<int:project_id>/
+
+
+for adding user in project    / POST method
+/projects/<int:project_id>/add_user/
+
+user_id : <int:user_id>
+
+
+for assign_permission to users in project   / POST method
+/projects/<int:project_id>/assign_permission/
+
+user_id : <int:user_id>
+can_create : true,
+can_read : true,
+can_update : false,
+can_delete : false
+
+
+for creating tasks  / POST method
+/tasks/
+
+project :<int: project_id>,
+title : task title,
+description : task description,
+status : pending,
+due_date : 2024-12-31
+
+
+for getting lists of tasks  / GET method
+/tasks/ 
+
+
+for updating task  / PUT method
+/tasks/<int:task_id>/
+
+project :<int: project_id>,
+title : task title,
+description : task description,
+status : pending,
+due_date : 2024-12-31
+
+
+for deleting task  / DELETE method
+/tasks/<int:task_id>/

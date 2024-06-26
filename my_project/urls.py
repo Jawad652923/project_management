@@ -16,9 +16,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-# from rest_framework_simplejwt.views import (TokenObtainPairView,TokenRefreshView,)
 from user.views import RegisterView, LoginView,UserListView
-from project_management.views import ProjectListCreateAPIView, ProjectDetailAPIView,ProjectAddUserAPIView, ProjectAssignPermissionsAPIView, TaskListCreateAPIView, TaskDetailAPIView, RetrieveTaskPermissionsAPIView
+from project_management.views import ProjectListCreateAPIView, ProjectDetailAPIView,ProjectAddUserAPIView, ProjectAssignPermissionsAPIView, TaskListCreateAPIView, TaskDetailAPIView
 from project_management import views
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
@@ -32,9 +31,7 @@ urlpatterns = [
     path('projects/', ProjectListCreateAPIView.as_view(), name='project-list-create'),
     path('projects/<int:pk>/', ProjectDetailAPIView.as_view(), name='project-detail'),
     path('projects/<int:pk>/add_user/', ProjectAddUserAPIView.as_view(), name='project-add-user'),
-
     path('projects/<int:pk>/assign_permissions/', ProjectAssignPermissionsAPIView.as_view(), name='project-assign-permissions'),
-    path('projects/<int:project_pk>/user/<int:user_id>/permissions/', RetrieveTaskPermissionsAPIView.as_view(), name='retrieve-task-permissions'),
 
 
     path('tasks/', TaskListCreateAPIView.as_view(), name='task-list-create'),
