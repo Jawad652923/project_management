@@ -35,14 +35,14 @@ for deleting project  / DELETE method
 /projects/<int:project_id>/
 
 
-for adding user in project    / POST method
+for adding user in project    / PUT method
 /projects/<int:project_id>/add_user/
 
 user_id : <int:user_id>
 
 
 for assign_permission to users in project   / POST method
-/projects/<int:project_id>/assign_permission/
+/projects/<int:project_id>/assign_permissions/
 
 user_id : <int:user_id>
 can_create : true,
