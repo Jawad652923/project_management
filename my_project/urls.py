@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from user.views import RegisterView, LoginView,UserListView
-from project_management.views import ProjectListCreateAPIView, ProjectDetailAPIView,ProjectAddUserAPIView, ProjectAssignPermissionsAPIView, TaskListCreateAPIView, TaskDetailAPIView
+from project_management.views import ProjectListCreateAPIView, ProjectDetailAPIView,ProjectAddUserAPIView, ProjectAssignPermissionsAPIView, TaskListCreateAPIView, TaskDetailAPIView,TaskAddUserAPIView,TaskAssignPermissionAPIView 
 from project_management import views
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
@@ -36,6 +36,8 @@ urlpatterns = [
 
     path('tasks/', TaskListCreateAPIView.as_view(), name='task-list-create'),
     path('tasks/<int:pk>/', TaskDetailAPIView.as_view(), name='task-detail'),
+    path('tasks/<int:pk>/add_user/', TaskAddUserAPIView.as_view(), name='task-add-user'),
+    path('tasks/<int:pk>/assign_permissions/',TaskAssignPermissionAPIView.as_view(), name='task-assign-permissions'),
 ]
 
 
