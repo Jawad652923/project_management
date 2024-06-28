@@ -77,3 +77,19 @@ due_date : 2024-12-31
 
 for deleting task  / DELETE method
 /tasks/<int:task_id>/
+
+
+for adding user in task    / PUT method
+/tasks/<int:task_id>/add_user/
+
+user_id : <int:user_id>
+
+
+for assign_permission to users in task   / POST method
+/tasks/<int:project_id>/assign_permissions/
+
+user_id : <int:user_id>
+can_create : true,
+can_read : true,
+can_update : false,
+can_delete : false
