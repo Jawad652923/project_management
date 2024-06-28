@@ -86,7 +86,7 @@ user_id : <int:user_id>
 
 
 for assign_permission to users in task   / POST method
-/tasks/<int:project_id>/assign_permissions/
+/tasks/<int:task_id>/assign_permissions/
 
 user_id : <int:user_id>
 can_create : true,
